@@ -3,10 +3,10 @@ import json
 from requests import get, post
 
 bot_token = '5965145269:AAHVV0UQB5x-Tb_rtcvpMFEGuK99vZSlI5M'
-server_address = "192.168.137.166"
+server_address = "192.168.137.165"
 PROXIES = {
-    "http": "192.168.1.100:8080",
-    "https": "192.168.1.100:8080"
+    "http": "192.168.120.150:8080",
+    "https": "192.168.120.150:8080"
 }
 AUTH_USERS = [
     648238505
