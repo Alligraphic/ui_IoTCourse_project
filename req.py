@@ -1,6 +1,21 @@
 from requests import get
-server = 'http://192.168.137.201/'
-
+import time
+server = 'http://192.168.137.144/'
+PARAMS = {
+    "On": 500,
+    "Off": 500
+}
 while True:
-    req = input()
-    get(f"{server}{req}")
+    req = "LED=OFF"
+    try:
+        get(f"{server}{req}")
+    except:
+        pass
+    time.sleep(1)
+    req = "LED=ON"
+    try:
+        get(f"{server}{req}")
+    except:
+        pass
+    # get(f"{server}", params=PARAMS)
+    time.sleep(1)

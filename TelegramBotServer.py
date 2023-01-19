@@ -15,8 +15,6 @@ VALID_CMDS = [
 
 ]
 
-PARAMS = {"LED": "ON"}
-
 
 def process(cmd):
     get(url=f'http://{server_address}/{cmd}')
