@@ -16,7 +16,8 @@ def saveValues(request, timeOn, timeOff):
         if count != 0:
             v = values.objects.filter(id = 1)
             for i in v:
-                if(timeOn != None and timeOff != None):
+                status = checkInputs(timeOn , timeOff)
+                if status:
                     On = int(timeOn)
                     Off = int(timeOff)
                     i.timeOn = On
@@ -27,6 +28,12 @@ def saveValues(request, timeOn, timeOff):
             Off = 500
             v = values(timeOn = On , timeOff = Off)
             v.save()
+
+def checkInputs(timeOn , timeOff):
+    if(timeOn != None and timeOff != None):
+        if(timeOn.isnumeric() and timeOff.isnumeric()):
+            return True
+    return False
 
 
 def getValues(request):
