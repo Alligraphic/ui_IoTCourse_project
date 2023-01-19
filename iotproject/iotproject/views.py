@@ -12,16 +12,16 @@ def firstPage(request):
 
 def saveValues(request, timeOn, timeOff):
     if request.method == 'GET':
-    #v = values.objects.filter(id=1)
         count = values.objects.all().count()
         if count != 0:
             v = values.objects.filter(id = 1)
             for i in v:
-                On = int(timeOn)
-                Off = int(timeOff)
-                i.timeOn = On
-                i.timeOff = Off
-                i.save()    
+                if(timeOn != None and timeOff != None):
+                    On = int(timeOn)
+                    Off = int(timeOff)
+                    i.timeOn = On
+                    i.timeOff = Off
+                    i.save()
         else:
             On = 500
             Off = 500
