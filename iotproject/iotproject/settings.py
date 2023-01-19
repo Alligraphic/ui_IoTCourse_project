@@ -13,8 +13,8 @@ SECRET_KEY = 'django-insecure-ng%@3si^^wpmz)ji#1wd5fuq$-jr=#oq2(!!*)aaf2h11n=q*1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-#ALLOWED_HOSTS = ['iotprojectui.pythonanywhere.com']
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['iotprojectui.pythonanywhere.com']
+
 
 
 # Application definition
