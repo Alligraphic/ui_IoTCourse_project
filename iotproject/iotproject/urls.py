@@ -5,5 +5,5 @@ from . import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('' , views.firstPage),
-    path('gui/', views.firstPage),
+    path('getValues/', views.getValues),
 ]

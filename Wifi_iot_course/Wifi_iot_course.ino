@@ -1,96 +1,95 @@
-#include <ESP8266WiFi.h>
-const char* ssid = "ALIREZA 1130";
-const char* password = "alireza8181";
-int ledPin = D4;
-WiFiServer server(80);
+#include <Arduino.h>
+#ifdef ESP32
+  #include <WiFi.h>
+  #include <AsyncTCP.h>
+#else
+  #include <ESP8266WiFi.h>
+  #include <ESPAsyncTCP.h>
+#endif
+#include <ESPAsyncWebServer.h>
+
+AsyncWebServer server(80);
+
+// REPLACE WITH YOUR NETWORK CREDENTIALS
+const char* ssid = "REPLACE_WITH_YOUR_SSID";
+const char* password = "REPLACE_WITH_YOUR_PASSWORD";
+
+const char* PARAM_ON = "On";
+const char* PARAM_OFF = "Off";
+
+// HTML web page to handle 3 input fields (input1, input2, input3)
+const char index_html[] PROGMEM = R"rawliteral(
+<!DOCTYPE HTML><html><head>
+  <title>ESP Input Form</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head><body>
+  <form action="/get">
+    input1: <input type="text" name="input1">
+    <input type="submit" value="Submit">
+  </form><br>
+  <form action="/get">
+    input2: <input type="text" name="input2">
+    <input type="submit" value="Submit">
+  </form><br>
+  <form action="/get">
+    input3: <input type="text" name="input3">
+    <input type="submit" value="Submit">
+  </form>
+</body></html>)rawliteral";
+
+void notFound(AsyncWebServerRequest *request) {
+  request->send(404, "text/plain", "Not found");
+}
 
 void setup() {
   Serial.begin(115200);
-  Serial.setDebugOutput(true);
-  delay(10);
-  pinMode(ledPin, OUTPUT);
-  digitalWrite(ledPin, LOW);
-  // Connect to WiFi network
-  Serial.println();
-  Serial.println();
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
-  Serial.println(password);
+  WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
-    Serial.print(".");
-    digitalWrite(ledPin, !digitalRead(ledPin));
-  }
-  Serial.println("");
-  Serial.println("WiFi connected");
-  // Start the server
-  server.begin();
-  Serial.println("Server started");
-  // Print the IP address
-  Serial.print("Use this URL : ");
-  Serial.print("http://");
-  Serial.print(WiFi.localIP());
-  Serial.println("/");
-}
-void loop() {
-  // Check if a client has connected
-  WiFiClient client = server.available();
-  if (!client) {
+  if (WiFi.waitForConnectResult() != WL_CONNECTED) {
+    Serial.println("WiFi Failed!");
     return;
   }
-  // Wait until the client sends some data
-  Serial.println("new client");
-  while (!client.available()) {
-    delay(1);
-  }
-  // Read the first line of the request
-  String request = client.readStringUntil('\r');
-  Serial.println(request);
-  client.flush();
-  // Match the request
-  int value = LOW;
-  // if (request.indexOf("/favicon.ico" ) != -1)
-  // {
-  //   Serial.println("fave detected...");
+  Serial.println();
+  Serial.print("IP Address: ");
+  Serial.println(WiFi.localIP());
 
-  // }
-  if (request.indexOf("/LED=ON") != -1) {
-    digitalWrite(ledPin, LOW);
-    value = LOW;
-  }
-  else if (request.indexOf("/LED=OFF") != -1) {
-    digitalWrite(ledPin, HIGH);
-    value = HIGH;
-  }
-    else if (request.indexOf("/RELAY=OFF") != -1) {
-    digitalWrite(ledPin, HIGH);
-    value = HIGH;
-  }
-    if (request.indexOf("/RELAY=ON") != -1) {
-    digitalWrite(ledPin, LOW);
-    value = LOW;
-  }
+  // Send web page with input fields to client
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/html", index_html);
+  });
 
-  // Return the response
-  client.println("HTTP/1.1 200 OK");
-  client.println("Content-Type: text/html");
-  client.println("");  // do not forget this one
-  client.println("<!DOCTYPE HTML>");
-  client.println("<html>");
-  client.print("Led pin is now: ");
-  // if (value == HIGH) {
-  //   client.print("On");
-  //   digitalWrite(ledPin, LOW);
-  // } else {
-  //   client.print("Off");
-  //   digitalWrite(ledPin, HIGH);
-  // }
-  client.println("<br><br>");
-  client.println("Click <a href=\"/LED=ON\">here</a> turn the LED on pin 5 ON<br>");
-  client.println("Click <a href=\"/LED=OFF\">here</a> turn the LED on pin 5 OFF<br>");
-  client.println("</html>");
-  delay(1);
-  Serial.println("Client disconnected");
-  Serial.println("");
+  // Send a GET request to <ESP_IP>/get?input1=<inputMessage>
+  server.on("/get", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    String inputMessage;
+    String inputParam;
+    // GET input1 value on <ESP_IP>/get?input1=<inputMessage>
+    if (request->hasParam(PARAM_INPUT_1)) {
+      inputMessage = request->getParam(PARAM_INPUT_1)->value();
+      inputParam = PARAM_INPUT_1;
+    }
+    // GET input2 value on <ESP_IP>/get?input2=<inputMessage>
+    else if (request->hasParam(PARAM_INPUT_2)) {
+      inputMessage = request->getParam(PARAM_INPUT_2)->value();
+      inputParam = PARAM_INPUT_2;
+    }
+    // GET input3 value on <ESP_IP>/get?input3=<inputMessage>
+    else if (request->hasParam(PARAM_INPUT_3)) {
+      inputMessage = request->getParam(PARAM_INPUT_3)->value();
+      inputParam = PARAM_INPUT_3;
+    }
+    else {
+      inputMessage = "No message sent";
+      inputParam = "none";
+    }
+    Serial.println(inputMessage);
+    request->send(200, "text/html", "HTTP GET request sent to your ESP on input field (" 
+                                     + inputParam + ") with value: " + inputMessage +
+                                     "<br><a href=\"/\">Return to Home Page</a>");
+  });
+  server.onNotFound(notFound);
+  server.begin();
+}
+
+void loop() {
+  
 }
