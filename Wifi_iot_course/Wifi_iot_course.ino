@@ -50,11 +50,6 @@ void loop() {
   client.flush();
   // Match the request
   int value = LOW;
-  // if (request.indexOf("/favicon.ico" ) != -1)
-  // {
-  //   Serial.println("fave detected...");
-
-  // }
   if (request.indexOf("/LED=ON") != -1) {
     digitalWrite(ledPin, LOW);
     value = LOW;
