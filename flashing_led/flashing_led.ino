@@ -7,16 +7,6 @@ int ledPin = D4;
 WiFiServer server(80);
 
 
-// int str_to_int(char arr[]) {
-//   int num = 0;
-//   while (arr++ != 0) {
-//     num *= 10;
-
-//     num = *arr - 48;
-//   }
-//   return num;
-// }
-
 
 int find_on_value(String req) 
 {
